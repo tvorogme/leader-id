@@ -1,0 +1,7 @@
+sqlalchemy
+requests
+pymorphy2
+bs4
+sklearn
+scipy
+numpy
