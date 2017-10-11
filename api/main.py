@@ -49,7 +49,7 @@ def add_course():
     return jsonify({"response": 1})
 
 
-@app.route('/api/get_recommendations/', methods=['POST'])
+@app.route('/api/recommendations/', methods=['POST'])
 def get_recommendation():
     json = request.json
 
