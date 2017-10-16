@@ -24,10 +24,18 @@ def fetch_information_by_url(_id):
 
     # Get header
     header = root.findAll('h1', {'class': 'title-lg'})
+
+    if len(header) == 0:
+        return None
+
     header = header[0].text
 
     # Get main text
     text = root.findAll('div', {'class': 'program'})
+
+    if len(text) == 0:
+        return None
+
     text = text[0].text
 
     return Course(**{'title': header,
