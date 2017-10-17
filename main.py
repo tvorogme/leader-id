@@ -4,6 +4,10 @@ if __name__ == "__main__":
     # # Init database
     create_tables()
 
+    from api.main import run_api
+
+    run_api()
+
     from parsers.all import update_all_wapper, update_all
 
     # Update
@@ -17,10 +21,6 @@ if __name__ == "__main__":
 
     # Generate thread with dataset update
     update_all_wapper()
-
-    from api.main import run_api
-
-    run_api()
 
     from db.utils import print_status
 

@@ -65,6 +65,11 @@ def get_course(specific_id, type):
     else:
         return None
 
+
+def rollback() -> None:
+    session.rollback()
+
+
 def print_status() -> None:
     events = session.query(Course).filter(Course.type == 'event').count()
     specials = session.query(Course).filter(Course.type == 'special').count()

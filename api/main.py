@@ -1,7 +1,8 @@
 from flask import Flask, request, jsonify
+from sqlalchemy import exc
 
 from db.models import Course
-from db.utils import save_courses, get_course
+from db.utils import save_courses, get_course, rollback
 from recommender.main import generate_vectors_wrapper
 from settings import DEBUG, PORT, HOST
 
@@ -42,7 +43,11 @@ def add_course():
     if 'error' in answer:
         return jsonify(answer)
 
-    save_courses([Course(**answer)])
+    try:
+        save_courses([Course(**answer)])
+    except exc.SQLAlchemyError:
+        rollback()
+        return jsonify({"error": {"code": 1, "field": "", "message": "One of field is not valid"}})
 
     generate_vectors_wrapper(answer['specific_id'])
 
@@ -57,7 +62,12 @@ def get_recommendation():
         if field not in json:
             return {"error": {"code": 1, "field": field, "message": "Specify %s field" % field}}
 
-    course = get_course(json['specific_id'], json['type'])
+    # Issue 1
+    try:
+        course = get_course(str(json['specific_id']), str(json['type']))
+    except exc.SQLAlchemyError:
+        rollback()
+        return jsonify({"error": {"code": 1, "field": "", "message": "One of field is not valid"}})
 
     if not course:
         return jsonify({"error": {"code": 3, "message": "No courses with such type and specific id"}})
