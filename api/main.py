@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from sqlalchemy import exc
+from utils.threadering import threaded
 
 from db.models import Course
 from db.utils import save_courses, get_course, rollback
@@ -83,6 +84,6 @@ def get_recommendation():
 
     return jsonify(answer)
 
-
+@threaded
 def run_api():
     app.run(debug=DEBUG, port=PORT, host=HOST)
