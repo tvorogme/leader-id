@@ -86,4 +86,4 @@ def get_recommendation():
 
 @threaded
 def run_api():
-    app.run(debug=DEBUG, port=PORT, host=HOST)
+    app.run(port=PORT, host=HOST)
