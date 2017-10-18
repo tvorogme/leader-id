@@ -31,6 +31,8 @@ def parse_openedu(data: list):
     needed_div = root.findAll('div', {'class': 'col-sm-8 issue'})
 
     if len(needed_div) > 0:
+        needed_div = needed_div[0]
+
         # Append text to data
         answer['text'] = text_sum([i.text for i in needed_div.findAll('p')])
 
