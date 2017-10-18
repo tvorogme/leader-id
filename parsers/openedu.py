@@ -34,9 +34,13 @@ def parse_openedu(data: list):
     answer['text'] = text_sum([i.text for i in needed_div.findAll('p')])
 
     # Find photo
-    photo = root.findAll('meta', {'property': 'og:image'})[0]
-    photo = photo['content']
-    answer['image_link'] = photo
+    photo = root.findAll('meta', {'property': 'og:image'})
+    
+    if len(photo) > 0:
+        photo = photo['content']
+        answer['image_link'] = photo
+    else:
+        answer['image_link'] = None
 
     answer['type'] = 'openedu'
     answer['is_active'] = True
