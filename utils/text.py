@@ -28,3 +28,11 @@ def clear_text(text: str) -> str:
 
     # one whitespace between the words
     return ' '.join(list(filter(lambda x: len(x) > 0, tmp_string.split(" "))))
+
+
+def text_sum(text: list) -> str:
+    tmp_text = ""
+    for i in text:
+        tmp_text += i
+        tmp_text += " "
+    return tmp_text
