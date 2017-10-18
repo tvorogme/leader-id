@@ -8,6 +8,7 @@ from recommender.main import generate_vectors_wrapper
 from utils.threadering import threaded
 
 
+@threaded
 def update_all():
     coursera_update_all()
     events_update_all()

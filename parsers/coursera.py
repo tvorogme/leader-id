@@ -4,7 +4,6 @@ from tqdm import tqdm
 
 from db.models import Course
 from db.utils import save_courses, get_all_specific_ids
-from settings import DEBUG
 from utils.parser import mozilla_headers
 from utils.text import clear_text
 
@@ -56,9 +55,14 @@ def parse_coursera_link(link):
         if len(courses) == 0:
             courses = root.findAll('div', {'class': 'module-desc'})
 
+        text = clear_text(" ".join(
+            [description.text + course.text for description, course in zip(descriptions, courses)]))
+
+        if len(title.text) < 3 or len(text) < 5:
+            return None
+
         return Course(**{'title': title.text,
-                         'text': clear_text(" ".join(
-                             [description.text + course.text for description, course in zip(descriptions, courses)])),
+                         'text': text,
                          'url': url,
                          'is_active': True,
                          'type': 'coursera',
@@ -74,6 +78,7 @@ def update_all():
     courses = list(filter(lambda x: x, courses))
     saved = save_courses(courses)
     print("Saved %s coursera courses" % saved)
+
 
 if __name__ == "__main__":
     update_all()

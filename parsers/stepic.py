@@ -4,7 +4,6 @@ import requests
 from tqdm import tqdm
 
 from db.utils import *
-from settings import DEBUG
 from utils.parser import mozilla_headers
 from utils.stepik_api import get_token
 from utils.text import clear_text
@@ -26,7 +25,7 @@ def parse_new_state_for_stepic_course(_id):
     return html['courses'][0]['is_active']
 
 
-def parse_course(course: dict) -> dict:
+def parse_course(course: dict):
     text = course['course_format'] + " "
     text += course['description'] + " "
     text += course['certificate'] + " "
@@ -41,6 +40,9 @@ def parse_course(course: dict) -> dict:
         image = 'https://stepik.org{}'.format(course['cover'])
     else:
         image = None
+
+    if len(course['title']) < 3 or len(text) < 5:
+        return None
 
     return Course(**{'text': text, 'title': course['title'], 'is_active': course['is_active'],
                      'url': get_course_url(course['id']), 'type': 'stepic', 'specific_id': course['id'],
@@ -61,6 +63,7 @@ def download_from_page(page_number: int):
         page_number += 1
         flag = current_data[1]
 
+    whole_data = list(filter(lambda x: x, whole_data))
     added_courses = save_courses(whole_data)
     print("Saved %s stepic courses" % added_courses)
 
