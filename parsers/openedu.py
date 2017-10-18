@@ -35,9 +35,9 @@ def parse_openedu(data: list):
 
     # Find photo
     photo = root.findAll('meta', {'property': 'og:image'})
-    
+
     if len(photo) > 0:
-        photo = photo['content']
+        photo = photo[0]['content']
         answer['image_link'] = photo
     else:
         answer['image_link'] = None
