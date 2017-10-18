@@ -28,24 +28,27 @@ def parse_openedu(data: list):
     root = BeautifulSoup(html.content.decode(), "html.parser")
 
     # Get div with text
-    needed_div = root.findAll('div', {'class': 'col-sm-8 issue'})[0]
+    needed_div = root.findAll('div', {'class': 'col-sm-8 issue'})
 
-    # Append text to data
-    answer['text'] = text_sum([i.text for i in needed_div.findAll('p')])
+    if len(needed_div) > 0:
+        # Append text to data
+        answer['text'] = text_sum([i.text for i in needed_div.findAll('p')])
 
-    # Find photo
-    photo = root.findAll('meta', {'property': 'og:image'})
+        # Find photo
+        photo = root.findAll('meta', {'property': 'og:image'})
 
-    if len(photo) > 0:
-        photo = photo[0]['content']
-        answer['image_link'] = photo
+        if len(photo) > 0:
+            photo = photo[0]['content']
+            answer['image_link'] = photo
+        else:
+            answer['image_link'] = None
+
+        answer['type'] = 'openedu'
+        answer['is_active'] = True
+
+        return Course(**answer)
     else:
-        answer['image_link'] = None
-
-    answer['type'] = 'openedu'
-    answer['is_active'] = True
-
-    return Course(**answer)
+        return None
 
 
 def update_all():
