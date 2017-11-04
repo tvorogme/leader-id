@@ -20,7 +20,8 @@ def generate_vectors():
         print("Start generating vectors")
         courses = session.query(Course).all()
 
-        text = [course.text if course.text is not None else "" for course in courses]
+        text = [course.text if course.text is not None else "" for course in courses] + open(
+            'stopwords.txt').read().split()
         stop_words = [i[0] for i in Counter(" ".join(text).split(" ")).most_common(STOP_WORDS_COUNT)]
         vectorizer = TfidfVectorizer(stop_words=stop_words)
         vectorizer_answer = vectorizer.fit_transform(text).toarray()
