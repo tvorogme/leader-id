@@ -26,28 +26,30 @@ def parse_new_state_for_stepic_course(_id):
 
 
 def parse_course(course: dict):
-    text = course['course_format'] + " "
-    text += course['description'] + " "
-    text += course['certificate'] + " "
-    text += course['requirements'] + " "
-    text += course['summary'] + " "
-    text += course['target_audience'] + " "
-    text += course['title'] + " "
+    if course['learners_count'] > 500:
+        text = course['course_format'] + " "
+        text += course['description'] + " "
+        text += course['certificate'] + " "
+        text += course['requirements'] + " "
+        text += course['summary'] + " "
+        text += course['target_audience'] + " "
+        text += course['title'] + " "
 
-    text = clear_text(text)
+        text = clear_text(text)
 
-    if course['cover']:
-        image = 'https://stepik.org{}'.format(course['cover'])
+        if course['cover']:
+            image = 'https://stepik.org{}'.format(course['cover'])
+        else:
+            image = None
+
+        if len(course['title']) < 3 or len(text) < 5:
+            return None
+
+        return Course(**{'text': text, 'title': course['title'], 'is_active': course['is_active'],
+                         'url': get_course_url(course['id']), 'type': 'stepic', 'specific_id': course['id'],
+                         'image_link': image})
     else:
-        image = None
-
-    if len(course['title']) < 3 or len(text) < 5:
         return None
-
-    return Course(**{'text': text, 'title': course['title'], 'is_active': course['is_active'],
-                     'url': get_course_url(course['id']), 'type': 'stepic', 'specific_id': course['id'],
-                     'image_link': image})
-
 
 def download_from_page(page_number: int):
     flag = True
