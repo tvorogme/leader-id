@@ -20,8 +20,29 @@ def generate_vectors():
         print("Start generating vectors")
         courses = session.query(Course).all()
 
-        text = [course.text if course.text is not None else "" for course in courses] + open(
-            'stopwords.txt').read().split()
+        blacklist = open('../stopwords.txt').read().split()
+
+        print("&" * 100)
+        print(blacklist)
+        print("&" * 100)
+
+        changed = False
+
+        for course in courses:
+            text_displayed = course.text + course.title
+
+            for black_item in blacklist:
+                if black_item in text_displayed:
+                    session.delete(course)
+                    changed = True
+                    pass
+
+
+        if changed:
+            session.commit()
+            courses = session.query(Course).all()
+
+        text = [course.text if course.text is not None else "" for course in courses]
         stop_words = [i[0] for i in Counter(" ".join(text).split(" ")).most_common(STOP_WORDS_COUNT)]
         vectorizer = TfidfVectorizer(stop_words=stop_words)
         vectorizer_answer = vectorizer.fit_transform(text).toarray()
