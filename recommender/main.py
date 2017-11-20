@@ -15,9 +15,9 @@ generate_vectors_lock = False
 def generate_vectors():
     global generate_vectors_lock
 
-    to_delete_courses = []
-
     if not generate_vectors_lock:
+        to_delete_courses = []
+
         generate_vectors_lock = True
 
         print("Start generating vectors")
@@ -27,7 +27,7 @@ def generate_vectors():
         blacklist = open('blacklist.txt').read().split()
 
         for course in courses:
-            text_displayed = course.text + course.title
+            text_displayed = (course.text + course.title).lower()
 
             for black_item in blacklist:
                 if black_item in text_displayed:
