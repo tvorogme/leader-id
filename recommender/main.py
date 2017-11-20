@@ -27,6 +27,11 @@ def generate_vectors():
         blacklist = open('blacklist.txt').read().split()
 
         for course in courses:
+            
+            if course.specific_id in ['64']:
+                to_delete_courses.append(course)
+                continue
+
             text_displayed = (course.text + course.title).lower()
 
             for black_item in blacklist:
