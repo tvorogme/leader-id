@@ -82,6 +82,8 @@ def update_similars(specific_id=None, to_delete_courses=None):
 
     session.commit()
 
+    print("Deleted {}".format(len(to_delete_courses)))
+
 
 @threaded
 def generate_vectors_wrapper(specific_id=None):
