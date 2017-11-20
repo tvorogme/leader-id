@@ -14,14 +14,17 @@ generate_vectors_lock = False
 
 def generate_vectors():
     global generate_vectors_lock
+
+    to_delete_courses = []
+
     if not generate_vectors_lock:
         generate_vectors_lock = True
 
         print("Start generating vectors")
         courses = session.query(Course).all()
+        print("Old len of courses was {}".format(len(courses)))
 
         blacklist = open('blacklist.txt').read().split()
-        to_delete_courses = []
 
         for course in courses:
             text_displayed = course.text + course.title
@@ -31,6 +34,7 @@ def generate_vectors():
                     to_delete_courses.append(course)
 
         courses = list(filter(lambda x: x not in to_delete_courses, courses))
+        print("New len of courses is {}".format(len(courses)))
 
         text = [course.text if course.text is not None else "" for course in courses]
         stop_words = [i[0] for i in Counter(" ".join(text).split(" ")).most_common(STOP_WORDS_COUNT)]
@@ -41,16 +45,12 @@ def generate_vectors():
             course.vector = vector
 
         session.commit()
-
-        for item in to_delete_courses:
-            session.delete(item)
-
-        session.commit()
-
         generate_vectors_lock = False
 
+        return to_delete_courses
 
-def update_similars(specific_id=None):
+
+def update_similars(specific_id=None, to_delete_courses=None):
     print(specific_id, type(specific_id))
 
     if specific_id:
@@ -59,6 +59,9 @@ def update_similars(specific_id=None):
         to_update = session.query(Course).filter(Course.type.in_(['event', 'special'])).all()
 
     to_recommend = session.query(Course).filter(~Course.type.in_(['event', 'special'])).all()
+
+    to_update = list(filter(lambda course: course not in to_delete_courses, to_update))
+    to_recommend = list(filter(lambda course: course not in to_delete_courses, to_recommend))
 
     for update_item in tqdm(to_update, desc="Update similar in db"):
         recommend = []
@@ -74,11 +77,18 @@ def update_similars(specific_id=None):
 
     session.commit()
 
+    for item in to_delete_courses:
+        session.delete(item)
+
+    session.commit()
+
 
 @threaded
 def generate_vectors_wrapper(specific_id=None):
-    generate_vectors()
-    update_similars(specific_id)
+    global to_delete_courses
+
+    to_delete_courses = generate_vectors()
+    update_similars(specific_id, to_delete_courses=to_delete_courses)
 
 
 if __name__ == "__main__":

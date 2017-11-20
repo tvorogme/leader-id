@@ -16,8 +16,8 @@ if __name__ == "__main__":
     from recommender.main import generate_vectors, update_similars
 
     # Generate vectors
-    generate_vectors()
-    update_similars()
+    to_delete_courses = generate_vectors()
+    update_similars(to_delete_courses=to_delete_courses)
 
     # Generate thread with dataset update
     # update_all_wapper()
