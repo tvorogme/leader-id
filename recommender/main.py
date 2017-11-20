@@ -20,27 +20,17 @@ def generate_vectors():
         print("Start generating vectors")
         courses = session.query(Course).all()
 
-        blacklist = open('../stopwords.txt').read().split()
-
-        print("&" * 100)
-        print(blacklist)
-        print("&" * 100)
-
-        changed = False
+        blacklist = open('blacklist.txt').read().split()
+        to_delete_courses = []
 
         for course in courses:
             text_displayed = course.text + course.title
 
             for black_item in blacklist:
                 if black_item in text_displayed:
-                    session.delete(course)
-                    changed = True
-                    pass
+                    to_delete_courses.append(course)
 
-
-        if changed:
-            session.commit()
-            courses = session.query(Course).all()
+        courses = list(filter(lambda x: x not in to_delete_courses, courses))
 
         text = [course.text if course.text is not None else "" for course in courses]
         stop_words = [i[0] for i in Counter(" ".join(text).split(" ")).most_common(STOP_WORDS_COUNT)]
@@ -49,6 +39,11 @@ def generate_vectors():
 
         for course, vector in tqdm(zip(courses, vectorizer_answer), desc="Update course information"):
             course.vector = vector
+
+        session.commit()
+
+        for item in to_delete_courses:
+            session.delete(item)
 
         session.commit()
 
